@@ -3,7 +3,7 @@ const User = require("../models/User");
 const searchDonors = async (req, res) => {
     try {
         const { bloodGroup, city } = req.query;
-
+        console.log(req.query);
         const query = {
             role: "Donor",
             available: true,
@@ -17,7 +17,11 @@ const searchDonors = async (req, res) => {
             query.city = city;
         }
 
+        console.log("Search Query:", query);
+
         const donors = await User.find(query).select("-password");
+
+        console.log("Found Donors:", donors);
 
         res.status(200).json({
             success: true,

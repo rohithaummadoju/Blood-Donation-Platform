@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API from "../services/api";
 
 function Register() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,6 +18,8 @@ function Register() {
     role: "Donor",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -24,24 +28,23 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
+    setLoading(true);
+
     try {
+      const response = await API.post("/register", formData);
 
-        const response = await API.post("/register", formData);
+      alert(response.data.message);
 
-        alert(response.data.message);
-
-        console.log(response.data);
-
+      navigate("/login");
     } catch (error) {
-
-        alert(error.response?.data?.message || "Registration Failed");
-
+      alert(error.response?.data?.message || "Registration Failed");
+    } finally {
+      setLoading(false);
     }
+  };
 
-};
   return (
     <div className="container mt-5 mb-5">
       <div className="row justify-content-center">
@@ -58,7 +61,6 @@ function Register() {
               <form onSubmit={handleSubmit}>
 
                 {/* Name */}
-
                 <div className="mb-3">
                   <label className="form-label">Full Name</label>
 
@@ -74,7 +76,6 @@ function Register() {
                 </div>
 
                 {/* Email */}
-
                 <div className="mb-3">
                   <label className="form-label">Email</label>
 
@@ -90,7 +91,6 @@ function Register() {
                 </div>
 
                 {/* Password */}
-
                 <div className="mb-3">
                   <label className="form-label">Password</label>
 
@@ -106,7 +106,6 @@ function Register() {
                 </div>
 
                 {/* Phone */}
-
                 <div className="mb-3">
                   <label className="form-label">Phone Number</label>
 
@@ -122,7 +121,6 @@ function Register() {
                 </div>
 
                 {/* Age */}
-
                 <div className="mb-3">
                   <label className="form-label">Age</label>
 
@@ -138,7 +136,6 @@ function Register() {
                 </div>
 
                 {/* Gender */}
-
                 <div className="mb-3">
                   <label className="form-label">Gender</label>
 
@@ -150,18 +147,13 @@ function Register() {
                     required
                   >
                     <option value="">Select Gender</option>
-
                     <option>Male</option>
-
                     <option>Female</option>
-
                     <option>Other</option>
-
                   </select>
                 </div>
 
                 {/* Blood Group */}
-
                 <div className="mb-3">
                   <label className="form-label">Blood Group</label>
 
@@ -173,7 +165,6 @@ function Register() {
                     required
                   >
                     <option value="">Select Blood Group</option>
-
                     <option>A+</option>
                     <option>A-</option>
                     <option>B+</option>
@@ -182,12 +173,10 @@ function Register() {
                     <option>AB-</option>
                     <option>O+</option>
                     <option>O-</option>
-
                   </select>
                 </div>
 
                 {/* City */}
-
                 <div className="mb-3">
                   <label className="form-label">City</label>
 
@@ -203,7 +192,6 @@ function Register() {
                 </div>
 
                 {/* Address */}
-
                 <div className="mb-3">
                   <label className="form-label">Address</label>
 
@@ -218,7 +206,6 @@ function Register() {
                 </div>
 
                 {/* Role */}
-
                 <div className="mb-4">
                   <label className="form-label">Role</label>
 
@@ -229,25 +216,22 @@ function Register() {
                     onChange={handleChange}
                   >
                     <option>Donor</option>
-
                     <option>Recipient</option>
-
                   </select>
                 </div>
 
-                {/* Button */}
-
+                {/* Register Button */}
                 <button
                   type="submit"
                   className="btn btn-danger w-100"
+                  disabled={loading}
                 >
-                  Register
+                  {loading ? "Registering..." : "Register"}
                 </button>
 
               </form>
 
               <p className="text-center mt-4">
-
                 Already have an account?
 
                 <Link

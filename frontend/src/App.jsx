@@ -11,7 +11,6 @@ import SearchDonor from "./pages/SearchDonor";
 import RequestBlood from "./pages/RequestBlood";
 
 import PrivateRoute from "./components/PrivateRoute";
-
 function App() {
   return (
     <BrowserRouter>
@@ -21,13 +20,21 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
+        <Route path="/profile" element={<Profile />} />
         {/* Protected Routes */}
         <Route
           path="/donor"
           element={
             <PrivateRoute>
               <DonorDashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/request/:donorId"
+          element={
+            <PrivateRoute>
+            <RequestBlood />
             </PrivateRoute>
           }
         />
@@ -67,16 +74,6 @@ function App() {
             </PrivateRoute>
           }
         />
-
-        <Route
-          path="/request"
-          element={
-            <PrivateRoute>
-              <RequestBlood />
-            </PrivateRoute>
-          }
-        />
-
       </Routes>
     </BrowserRouter>
   );

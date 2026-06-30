@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../services/api";
+import { AuthContext } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -27,8 +29,8 @@ function Login() {
     try {
       const response = await API.post("/login", formData);
 
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      // Update AuthContext and localStorage
+      login(response.data.user, response.data.token);
 
       alert("Login Successful");
 
@@ -42,9 +44,9 @@ function Login() {
       }
     } catch (error) {
       alert(error.response?.data?.message || "Login Failed");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -107,7 +109,9 @@ function Login() {
 
               <p className="text-center mt-3">
                 Don't have an account?{" "}
-                <Link to="/register">Register</Link>
+                <Link to="/register">
+                  Register
+                </Link>
               </p>
 
             </div>
