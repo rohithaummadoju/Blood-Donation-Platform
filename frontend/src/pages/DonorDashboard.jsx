@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import DonationCertificate from "../components/DonationCertificate";
 
 function DonorDashboard() {
 
     const [requests, setRequests] = useState([]);
     const [history, setHistory] = useState([]);
     const [available, setAvailable] = useState(true);
+    const [profile, setProfile] = useState({});
 
     const fetchRequests = async () => {
 
@@ -22,7 +24,7 @@ function DonorDashboard() {
             // Donor Profile
             const profileRes = await API.get("/api/users/profile");
             setAvailable(profileRes.data.user.available);
-
+            setProfile(profileRes.data.user);
         } catch (error) {
 
             console.log(error);
@@ -128,6 +130,25 @@ function DonorDashboard() {
                 </div>
 
             </div>
+            {requests.some(
+                request =>
+                    request.status === "Pending" &&
+                    request.urgency === "Emergency"
+                ) && (
+
+                <div className="alert alert-danger shadow">
+
+                <h4 className="mb-1">
+                    🚨 Emergency Blood Request
+                </h4>
+
+                <p className="mb-0">
+                    One or more emergency blood requests require your immediate attention.
+                </p>
+
+            </div>
+
+        )}
 
             {/* Incoming Requests */}
 
@@ -145,6 +166,17 @@ function DonorDashboard() {
 
                 requests
                     .filter(req => req.status === "Pending")
+                    .sort((a, b) => {
+
+                    const priority = {
+                        Emergency: 3,
+                        High: 2,
+                        Normal: 1
+                    };
+
+                    return priority[b.urgency] - priority[a.urgency];
+
+        })
                     .map((req) => (
 
                         <div
@@ -193,10 +225,19 @@ function DonorDashboard() {
                                 <p>
                                     <strong>Urgency:</strong>{" "}
 
-                                    <span className="badge bg-danger">
-                                        {req.urgency}
-                                    </span>
-
+                                    {req.urgency === "Emergency" ? (
+                                        <span className="badge bg-danger fs-6">
+                                            🚨 EMERGENCY
+                                        </span>
+                                        ) : req.urgency === "High" ? (
+                                            <span className="badge bg-warning text-dark fs-6">
+                                                ⚠️ HIGH
+                                            </span>
+                                        ) : (
+                                            <span className="badge bg-info fs-6">
+                                                🟢 NORMAL
+                                            </span>
+                                        )}
                                 </p>
 
                                 <p>
@@ -315,6 +356,14 @@ function DonorDashboard() {
                                 {item.status}
 
                             </span>
+                            <div className="mt-3">
+                                <DonationCertificate
+                                donor={{
+                                    name: profile.name,
+                                    bloodGroup: profile.bloodGroup
+                                }}
+                                />
+                            </div>
 
                         </div>
 

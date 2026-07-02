@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const sendEmail = require("../utils/sendEmail");
 // ================= REGISTER =================
 const registerUser = async (req, res) => {
     try {
@@ -50,7 +50,71 @@ const registerUser = async (req, res) => {
             address,
             role
         });
+        await sendEmail(
 
+    user.email,
+
+    "Welcome to On Live Blood Share",
+
+    `
+    <div style="font-family:Arial;padding:20px">
+
+        <h2 style="color:#d9534f;">
+            🩸 Welcome to On Live Blood Share
+        </h2>
+
+        <p>Hello <strong>${user.name}</strong>,</p>
+
+        <p>
+            Your account has been created successfully.
+        </p>
+
+        <table
+            style="border-collapse:collapse;"
+            cellpadding="8"
+        >
+
+            <tr>
+
+                <td><strong>Name</strong></td>
+
+                <td>${user.name}</td>
+
+            </tr>
+
+            <tr>
+
+                <td><strong>Email</strong></td>
+
+                <td>${user.email}</td>
+
+            </tr>
+
+            <tr>
+
+                <td><strong>Role</strong></td>
+
+                <td>${user.role}</td>
+
+            </tr>
+
+        </table>
+
+        <br>
+
+        <p>
+            Thank you for becoming a part of our mission to save lives through blood donation.
+        </p>
+
+        <hr>
+
+        <p style="color:gray;">
+            Team On Live Blood Share
+        </p>
+
+    </div>
+    `
+);
         res.status(201).json({
             success: true,
             message: "User registered successfully",

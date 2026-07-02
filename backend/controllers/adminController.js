@@ -2,8 +2,12 @@ const User = require("../models/User");
 const BloodRequest = require("../models/BloodRequest");
 
 // Dashboard Statistics
+// Dashboard Statistics
 const getDashboardStats = async (req, res) => {
+
     try {
+
+        const totalUsers = await User.countDocuments();
 
         const totalDonors = await User.countDocuments({
             role: "Donor"
@@ -15,19 +19,49 @@ const getDashboardStats = async (req, res) => {
 
         const totalRequests = await BloodRequest.countDocuments();
 
-        const totalDonations = await BloodRequest.countDocuments({
+        const acceptedRequests = await BloodRequest.countDocuments({
             status: "Accepted"
         });
 
-        res.status(200).json({
-            success: true,
-            stats: {
-                totalDonors,
-                totalRecipients,
-                totalRequests,
-                totalDonations
-            }
+        const rejectedRequests = await BloodRequest.countDocuments({
+            status: "Rejected"
         });
+
+        const pendingRequests = await BloodRequest.countDocuments({
+            status: "Pending"
+        });
+        const chartData = {
+            labels: ["Accepted", "Rejected", "Pending"],
+            datasets: [
+            {
+                label: "Blood Requests",
+                data: [
+                    acceptedRequests,
+                    rejectedRequests,
+                    pendingRequests
+                ],
+                backgroundColor: [
+                    "#28a745",
+                    "#dc3545",
+                    "#ffc107"
+                ]
+            }
+        ]
+    };
+
+    res.status(200).json({
+        success: true,
+        stats: {
+            totalUsers,
+            totalDonors,
+            totalRecipients,
+            totalRequests,
+            acceptedRequests,
+            rejectedRequests,
+            pendingRequests
+        },
+        chartData
+    });
 
     } catch (error) {
 
@@ -39,6 +73,7 @@ const getDashboardStats = async (req, res) => {
         });
 
     }
+
 };
 
 // Get All Users
@@ -176,10 +211,94 @@ const deleteRequest = async (req, res) => {
 
 };
 
+const getTopDonors = async (req, res) => {
+
+    try {
+
+        const donors = await BloodRequest.aggregate([
+
+            {
+                $match: {
+                    status: "Accepted"
+                }
+            },
+
+            {
+                $group: {
+                    _id: "$donor",
+                    donations: { $sum: 1 }
+                }
+            },
+
+            {
+                $sort: {
+                    donations: -1
+                }
+            },
+
+            {
+                $limit: 10
+            }
+
+        ]);
+
+        const leaderboard = [];
+
+        for (const donor of donors) {
+
+            const user = await User.findById(donor._id).select(
+                "name bloodGroup city"
+            );
+
+            if (user) {
+
+                leaderboard.push({
+
+                    _id: user._id,
+
+                    name: user.name,
+
+                    bloodGroup: user.bloodGroup,
+
+                    city: user.city,
+
+                    donations: donor.donations
+
+                });
+
+            }
+
+        }
+
+        res.status(200).json({
+
+            success: true,
+
+            leaderboard
+
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+};
+
 module.exports = {
     getDashboardStats,
     getAllUsers,
     deleteUser,
     getAllRequests,
-    deleteRequest
+    deleteRequest,
+    getTopDonors
 };

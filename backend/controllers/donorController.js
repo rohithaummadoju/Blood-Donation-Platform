@@ -39,6 +39,49 @@ const searchDonors = async (req, res) => {
     }
 };
 
+// ================= GET DONORS FOR MAP =================
+
+const getMapDonors = async (req, res) => {
+
+    try {
+
+        const donors = await User.find({
+
+            role: "Donor",
+
+            available: true,
+
+            "location.latitude": { $ne: null },
+
+            "location.longitude": { $ne: null }
+
+        }).select("-password");
+
+        res.status(200).json({
+
+            success: true,
+
+            donors
+
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+
+            success: false,
+
+            message: "Server Error"
+
+        });
+
+    }
+
+};
+
 module.exports = {
     searchDonors,
+    getMapDonors
 };

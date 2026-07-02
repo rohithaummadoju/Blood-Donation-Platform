@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import NotificationBell from "./NotificationBell";
 
 function Navbar() {
     const navigate = useNavigate();
@@ -47,6 +48,11 @@ function Navbar() {
                                 Search Donor
                             </Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/nearby-donors">
+                                🗺️ Nearby Donors
+                            </Link>
+                        </li>
 
 
                         {user && (
@@ -58,6 +64,7 @@ function Navbar() {
                         )}
 
                     </ul>
+                    
 
                     {/* Right Menu */}
                     <ul className="navbar-nav">
@@ -82,6 +89,9 @@ function Navbar() {
                                     <span className="nav-link text-white fw-bold">
                                         Welcome, {user.name}
                                     </span>
+                                </li>
+                                <li className="nav-item me-3">
+                                <NotificationBell />
                                 </li>
 
                                 <li className="nav-item">

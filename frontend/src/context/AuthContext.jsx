@@ -11,9 +11,7 @@ export const AuthProvider = ({ children }) => {
         const storedUser = localStorage.getItem("user");
 
         if (storedUser) {
-
             setUser(JSON.parse(storedUser));
-
         }
 
     }, []);
@@ -24,6 +22,9 @@ export const AuthProvider = ({ children }) => {
 
         localStorage.setItem("user", JSON.stringify(userData));
 
+        // Save user id separately
+        localStorage.setItem("userId", userData._id || userData.id);
+
         setUser(userData);
 
     };
@@ -31,15 +32,14 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
 
         localStorage.removeItem("token");
-
         localStorage.removeItem("user");
+        localStorage.removeItem("userId");
 
         setUser(null);
 
     };
 
     return (
-
         <AuthContext.Provider
             value={{
                 user,
@@ -49,7 +49,6 @@ export const AuthProvider = ({ children }) => {
         >
             {children}
         </AuthContext.Provider>
-
     );
 
 };

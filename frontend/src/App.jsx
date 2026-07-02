@@ -9,6 +9,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
 import SearchDonor from "./pages/SearchDonor";
 import RequestBlood from "./pages/RequestBlood";
+import MapView from "./components/MapView";
+import NearbyDonors from "./pages/NearbyDonors";
+
 
 import PrivateRoute from "./components/PrivateRoute";
 function App() {
@@ -71,6 +74,15 @@ function App() {
           element={
             <PrivateRoute>
               <SearchDonor />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/nearby-donors"
+          element={
+            <PrivateRoute>
+              <NearbyDonors />
             </PrivateRoute>
           }
         />

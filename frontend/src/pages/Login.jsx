@@ -29,8 +29,11 @@ function Login() {
     try {
       const response = await API.post("/login", formData);
 
-      // Update AuthContext and localStorage
+      // Update AuthContext
       login(response.data.user, response.data.token);
+
+      // Save user ID for Profile page
+      localStorage.setItem("userId", response.data.user.id);
 
       alert("Login Successful");
 
@@ -52,19 +55,14 @@ function Login() {
   return (
     <div className="container mt-5">
       <div className="row justify-content-center">
-
         <div className="col-md-5">
-
           <div className="card shadow-lg">
-
             <div className="card-body">
-
               <h2 className="text-center text-danger mb-4">
                 Login
               </h2>
 
               <form onSubmit={handleSubmit}>
-
                 <div className="mb-3">
                   <label className="form-label">
                     Email
@@ -104,7 +102,6 @@ function Login() {
                 >
                   {loading ? "Logging in..." : "Login"}
                 </button>
-
               </form>
 
               <p className="text-center mt-3">
@@ -115,11 +112,8 @@ function Login() {
               </p>
 
             </div>
-
           </div>
-
         </div>
-
       </div>
     </div>
   );

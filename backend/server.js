@@ -8,8 +8,11 @@ const donorRoutes = require("./routes/donorRoutes");
 const requestRoutes=require("./routes/requestRoutes");
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-const profileRoutes = require("./routes/profileRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+
 dotenv.config();
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "Loaded" : "Missing");
 
 connectDB();
 
@@ -23,7 +26,7 @@ app.use("/api/donors", donorRoutes);
 app.use("/api/requests",requestRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/profile", profileRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 5000;
 

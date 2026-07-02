@@ -1,17 +1,23 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
-
+import {Chart as ChartJS,ArcElement,Tooltip,Legend} from "chart.js";
+import { Pie } from "react-chartjs-2";
+    ChartJS.register(ArcElement,Tooltip,Legend);
 function AdminDashboard() {
 
     const [stats, setStats] = useState({
+        totalUsers: 0,
         totalDonors: 0,
         totalRecipients: 0,
         totalRequests: 0,
-        totalDonations: 0
+        acceptedRequests: 0,
+        rejectedRequests: 0,
+        pendingRequests: 0
     });
-
+    const [chartData, setChartData] = useState(null);
     const [users, setUsers] = useState([]);
     const [requests, setRequests] = useState([]);
+    const [leaderboard, setLeaderboard] = useState([]);
 
     useEffect(() => {
         loadDashboard();
@@ -23,12 +29,14 @@ function AdminDashboard() {
 
             const statsResponse = await API.get("/api/admin/dashboard");
             setStats(statsResponse.data.stats);
-
+            setChartData(statsResponse.data.chartData);
             const usersResponse = await API.get("/api/admin/users");
             setUsers(usersResponse.data.users);
 
             const requestsResponse = await API.get("/api/admin/requests");
             setRequests(requestsResponse.data.requests);
+            const leaderboardResponse = await API.get("/api/admin/leaderboard");
+            setLeaderboard(leaderboardResponse.data.leaderboard);
 
         } catch (error) {
 
@@ -85,6 +93,7 @@ function AdminDashboard() {
         }
 
     };
+    console.log("Dashboard Stats:", stats);
 
     return (
 
@@ -99,45 +108,64 @@ function AdminDashboard() {
             <div className="row">
 
                 <div className="col-md-3 mb-4">
-                    <div className="card border-danger shadow text-center">
+                    <div className="card bg-dark text-white shadow text-center">
                         <div className="card-body">
-                            <h5>Total Donors</h5>
-                            <h1 className="text-danger">
-                                {stats.totalDonors}
-                            </h1>
+                            <h5>👤 Total Users</h5>
+                            <h1>{stats.totalUsers}</h1>
                         </div>
                     </div>
                 </div>
 
                 <div className="col-md-3 mb-4">
-                    <div className="card border-primary shadow text-center">
+                    <div className="card bg-danger text-white shadow text-center">
                         <div className="card-body">
-                            <h5>Total Recipients</h5>
-                            <h1 className="text-primary">
-                                {stats.totalRecipients}
-                            </h1>
+                            <h5>🩸 Total Donors</h5>
+                            <h1>{stats.totalDonors}</h1>
                         </div>
                     </div>
                 </div>
 
                 <div className="col-md-3 mb-4">
-                    <div className="card border-warning shadow text-center">
+                    <div className="card bg-primary text-white shadow text-center">
                         <div className="card-body">
-                            <h5>Total Requests</h5>
-                            <h1 className="text-warning">
-                                {stats.totalRequests}
-                            </h1>
+                            <h5>❤️ Total Recipients</h5>
+                            <h1>{stats.totalRecipients}</h1>
                         </div>
                     </div>
                 </div>
 
                 <div className="col-md-3 mb-4">
-                    <div className="card border-success shadow text-center">
+                    <div className="card bg-warning text-dark shadow text-center">
                         <div className="card-body">
-                            <h5>Total Donations</h5>
-                            <h1 className="text-success">
-                                {stats.totalDonations}
-                            </h1>
+                            <h5>📩 Total Requests</h5>
+                            <h1>{stats.totalRequests}</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="col-md-4 mb-4">
+                    <div className="card bg-success text-white shadow text-center">
+                        <div className="card-body">
+                            <h5>✅ Accepted</h5>
+                            <h1>{stats.acceptedRequests}</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="col-md-4 mb-4">
+                    <div className="card bg-secondary text-white shadow text-center">
+                        <div className="card-body">
+                            <h5>❌ Rejected</h5>
+                            <h1>{stats.rejectedRequests}</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="col-md-4 mb-4">
+                    <div className="card bg-info text-white shadow text-center">
+                        <div className="card-body">
+                            <h5>⏳ Pending</h5>
+                            <h1>{stats.pendingRequests}</h1>
                         </div>
                     </div>
                 </div>
@@ -147,7 +175,104 @@ function AdminDashboard() {
             <hr className="my-5" />
 
             {/* Users */}
+            <div className="card shadow mb-5">
 
+                <div className="card-header bg-dark text-white">
+                    <h4 className="mb-0">
+                        📊 Blood Request Status
+                    </h4>
+                </div>
+
+                <div className="card-body text-center">
+
+                    {chartData && (
+                        <div
+                            style={{
+                                width: "400px",
+                                margin: "0 auto"
+                            }}
+                        >
+                        <Pie data={chartData} />
+                        </div>
+                    )}
+
+                </div>
+
+            </div>
+            <div className="card shadow mb-5">
+
+                <div className="card-header bg-success text-white">
+                    <h4 className="mb-0">
+                        🏆 Top Blood Donors
+                    </h4>
+                </div>
+
+                <div className="card-body">
+
+                    {leaderboard.length === 0 ? (
+
+                        <p className="text-center">
+                            No donations yet.
+                        </p>
+
+                    ) : (
+
+                        <table className="table table-striped">
+
+                        <thead>
+
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Blood Group</th>
+                            <th>City</th>
+                            <th>Total Donations</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {leaderboard.map((donor, index) => (
+
+                            <tr key={donor._id}>
+
+                                <td>
+                                    {index === 0
+                                        ? "🥇"
+                                        : index === 1
+                                        ? "🥈"
+                                        : index === 2
+                                        ? "🥉"
+                                        : index + 1}
+                                </td>
+
+                                <td>{donor.name}</td>
+
+                                <td>{donor.bloodGroup}</td>
+
+                                <td>{donor.city}</td>
+
+                                <td>
+                                    <span className="badge bg-success">
+                                        {donor.donations}
+                                    </span>
+                                </td>
+
+                            </tr>
+
+                        ))}
+
+                    </tbody>
+
+                </table>
+
+            )}
+
+        </div>
+        </div>
+            
+            
             <h3 className="text-danger mb-4">
                 Registered Users
             </h3>
