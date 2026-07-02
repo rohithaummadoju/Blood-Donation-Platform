@@ -20,7 +20,16 @@ const registerUser = async (req, res) => {
         } = req.body;
 
         // Check if user already exists
-        const existingUser = await User.findOne({ email });
+        // Debug logs
+console.log("=== REGISTER REQUEST ===");
+console.log("Email:", email);
+
+const mongoose = require("mongoose");
+console.log("Mongo readyState:", mongoose.connection.readyState);
+console.log("Database:", mongoose.connection.name);
+
+// Check if user already exists
+const existingUser = await User.findOne({ email });
 
         if (existingUser) {
             return res.status(400).json({
