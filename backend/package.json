@@ -20,7 +20,7 @@
     "express": "^5.2.1",
     "geolib": "^3.3.14",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.7.3",
+    "mongoose": "^8.24.1",
     "nodemailer": "^9.0.3",
     "react-router-dom": "^7.18.0"
   },
